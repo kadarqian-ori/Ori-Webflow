@@ -1,3 +1,4 @@
+console.log("begin");
 /* GLOBAL VARIABLES */
 var auth0Client = null;
 var user = null;
