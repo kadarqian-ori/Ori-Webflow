@@ -332,6 +332,11 @@ const handleAuth0 = async () => {
     if (isAuthenticated) {
         if (!user) {
             user = await auth0Client.getUser();
+            analytics.identify(user.sub, {
+                "email": user.email,
+                "role": user.role,
+                "buildingID": user.app_metadata?.buildingID
+            });
         }
         //window.history.replaceState({ }, document.title, window.location.pathname);
         dispatchInitializationEvent();
@@ -346,6 +351,11 @@ const handleAuth0 = async () => {
             await auth0Client.handleRedirectCallback();
 
             user = await auth0Client.getUser();
+            analytics.identify(user.sub, {
+                "email": user.email,
+                "role": user.role,
+                "buildingID": user.app_metadata?.buildingID
+            });
 
             window.history.replaceState({}, document.title, window.location.pathname);
         } catch (error) {
