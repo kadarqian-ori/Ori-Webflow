@@ -512,3 +512,118 @@ function popupEmailWindow(email, subject, body) {
     const newWindow = window.open('', '_blank', 'width=800,height=800');
     newWindow.location.href = mailtoUrl;
 }
+
+// Metrics
+
+/*{
+    database: String
+    page: Use Attributes defined in Constants
+    tab: Defined below
+    eventName: Defined per page
+    userPayload
+}*/
+// Must be called after Auth0 initialization. Up to caller to enforce this.
+function logEvent(page, tab, eventName) {
+    const userPayload = {
+        userID: user.sub,
+        email: user.email,
+        buildingID: user.app_metadata?.buildingID,
+    }
+    const executePostRequest = createPostRequestPromise("https://vu8dd36vm1.execute-api.us-east-1.amazonaws.com/prod/metrics", {
+        database: "property-portal-metrics",
+        page: page,
+        tab: tab,
+        eventName: eventName,
+        userPayload: userPayload,
+    });
+    executePostRequest
+        .then(response => {
+            console.log("Logged event.", response);
+        })
+        .catch(error => {
+            console.error("Error logging event:", error);
+        })
+}
+
+// Metrics Constants (Prefixed with "km")
+
+const kmIntroOriOverview = "OriOverview";
+const kmIntroDesignGuidelines = "DesignGuidelines";
+const kmIntroCaseStudies = "CaseStudies";
+
+const kmSalesFitGuidelines = "FitGuidelines";
+const kmSalesFitChecklist = "FitChecklist";
+const kmSalesTestFit = "TestFit";
+const kmSalesLockInPrice = "LockInPrice";
+
+const kmPreInstallRFIs = "RFIs";
+const kmPreInstallKnownRisks = "KnownRisks";
+const kmPreInstallChangeOrders = "ChangeOrders";
+const kmPreInstallReleaseToProduction = "ReleaseToProduction";
+
+const kmInstallActiveInstall = "ActiveInstall";
+const kmInstallNoticeOfCompletion = "NoticeOfCompletion";
+
+const kmLeasingLeads = "Leads";
+const kmLeasingAvailableUnits = "AvailableUnits";
+const kmLeasingLeasedUnits = "LeasedUnits";
+const kmLeasingLostLeads = "LostLeads";
+
+const kmHelpResourceGetStarted = "get-started";
+const kmHelpResourceResources = "resources";
+const kmHelpResourceContactOri = "contact-ori";
+
+// Events (prefixed with kme)
+// Types: "Clicked", "Viewed"
+const kmTypeClicked = "Clicked";
+const kmTypeViewed = "Viewed";
+
+// Pre Install
+const kmeRFIRespondClicked = kmTypeClicked + "RFIRespond";
+const kmeRFILinkClicked = kmTypeClicked + "RFILink";
+const kmeKnownRisksAcknowledgeClicked = kmTypeClicked + "KnownRisksAcknowledge";
+const kmeKnownRisksLinkClicked = kmTypeClicked + "KnownRisksLink";
+
+const kmeReleaseToProductionButtonClicked = kmTypeClicked + "ReleaseToProductionButton";
+const kmeReleaseToProductionLinkClicked = kmTypeClicked + "ReleaseToProductionLink";
+
+// Install
+const kmeInstallAssistantClicked = kmTypeClicked + "InstallAssistant";
+const kmeInstallApproveInstall = kmTypeClicked + "InstallApproveButton";
+
+// Leasing
+const kmeLeadsContactClicked = kmTypeClicked + "LeadsContact";
+const kmeLeadsLeasedClicked = kmTypeClicked + "LeadsLeased";
+const kmeLeadsLeasedUnitClicked = kmTypeClicked + "LeadsLeasedUnit";
+const kmeLeadsLeasedRentClicked = kmTypeClicked + "LeadsLeasedRent";
+const kmeLeadsMoveInDateClicked = kmTypeClicked + "LeadsLeasedMoveInDate";
+const kmeLeadsLeaseDurationClicked = kmTypeClicked + "LeadsLeasedDuration";
+const kmeLeadsLeaseCancelClicked = kmTypeClicked + "LeadsLeasedCancel";
+const kmeLeadsLeaseSubmitClicked = kmTypeClicked + "LeadsLeasedSubmit";
+const kmeLeadsLostClicked = kmTypeClicked + "LeadsLost";
+const kmeLeadsLostCancelClicked = kmTypeClicked + "LeadsLostCancel";
+const kmeLeadsLostSubmitClicked = kmTypeClicked + "LeadsLostSubmit";
+
+const kmeAvailableUnitsEditClicked = kmTypeClicked + "AvailableUnitsEdit";
+const kmeAvailableUnitsRentClicked = kmTypeClicked + "AvailableUnitsRent";
+const kmeAvailableUnitsPremiumClicked = kmTypeClicked + "AvailableUnitsPremium";
+const kmeAvailableUnitsSquareFootageClicked = kmTypeClicked + "AvailableUnitsSquareFootage";
+const kmeAvailableUnitsLeasedClicked = kmTypeClicked + "AvailableUnitsLeased";
+const kmeAvailableUnitsAvailableClicked = kmTypeClicked + "AvailableUnitsAvailable";
+const kmeAvailableUnitsOnHoldClicked = kmTypeClicked + "AvailableUnitsOnHold";
+const kmeAvailableUnitsCancelClicked = kmTypeClicked + "AvailableUnitsCancel";
+const kmeAvailableUnitsSubmitClicked = kmTypeClicked + "AvailableUnitsSubmit";
+
+const kmeLeasedUnitsUpdateClicked = kmTypeClicked + "LeasedUnitsUpdate";
+
+const kmeLostLeadsContactClicked = kmTypeClicked + "LostLeadsContact";
+const kmeLostLeadsLeasedClicked = kmTypeClicked + "LostLeadsLeased";
+const kmeLostLeadsLeasedUnitClicked = kmTypeClicked + "LostLeadsLeasedUnit";
+const kmeLostLeadsLeasedRentClicked = kmTypeClicked + "LostLeadsLeasedRent";
+const kmeLostLeadsMoveInDateClicked = kmTypeClicked + "LostLeadsLeasedMoveInDate";
+const kmeLostLeadsLeaseDurationClicked = kmTypeClicked + "LostLeadsLeasedDuration";
+const kmeLostLeadsLeaseCancelClicked = kmTypeClicked + "LostLeadsLeasedCancel";
+const kmeLostLeadsLeaseSubmitClicked = kmTypeClicked + "LostLeadsLeasedSubmit";
+
+// Management
+const kmeSystemsGetHelpClicked = kmTypeClicked + "SystemsGetHelpButton";
