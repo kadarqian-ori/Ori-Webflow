@@ -519,7 +519,7 @@ function latestChannelPath(cachedResponse) {
             latestAttribute = attribute;
         }
     }
-
+git
     return latestAttribute;
 }
 
