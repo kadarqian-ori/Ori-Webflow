@@ -504,7 +504,7 @@ if (pageRequiresAuthentication()) {
 }
 
 function latestChannelPath(cachedResponse) {
-    if (isMobileDevice) {
+    if (isMobileDevice()) {
         return kInstallPath;
     }
 
