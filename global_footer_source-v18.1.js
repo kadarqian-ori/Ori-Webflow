@@ -19,17 +19,23 @@ const kChannelLinkAttribute = "channel-link";
 
 const kIntroAttribute = "intro";
 const kSalesAttribute = "sales";
-const kPreInstallAttribute = "pre-install";
 const kInstallAttribute = "install";
+const kLockInPriceAttribute = "lock-in-price";
+const kReleaseToProductionAttribute = "release-to-production";
+const kReleaseForShipmentAttribute = "release-for-shipment";
 const kLeasingAttribute = "leasing";
-const kManagementAttribute = "management"
+const kManagementAttribute = "management";
+const kMissingItemsAttribute = "pre-install";
 const kChannelAttributes = [
     kIntroAttribute,
     kSalesAttribute,
-    kPreInstallAttribute,
     kInstallAttribute,
+    kLockInPriceAttribute,
+    kReleaseToProductionAttribute,
+    kReleaseForShipmentAttribute,
     kLeasingAttribute,
-    kManagementAttribute
+    kManagementAttribute,
+    kMissingItemsAttribute,
 ];
 
 // Channel link states
@@ -121,7 +127,15 @@ async function populateLefthandNavigation(cachedResponse) {
 function setBuildingName(buildingName) {
     // buildingName
     const buildingNameTextField = document.getElementById("buildingName");
-    buildingNameTextField.innerHTML = buildingName;
+    if (buildingNameTextField) {
+        buildingNameTextField.innerHTML = buildingName;
+    }
+
+    // mobile buildingName
+    const buildingNameMobileTextField = document.getElementById("buildingNameMobile");
+    if (buildingNameMobileTextField) {
+        buildingNameMobileTextField.innerHTML = buildingName;
+    }
 }
 
 function addItemToDropdown(dropdownId, text, value) {
@@ -150,8 +164,12 @@ function setChannelStates(permissions) {
         configureChannel(kIntroAttribute, permissions);
     } else if (path == kSalesPath) {
         configureChannel(kSalesAttribute, permissions);
-    } else if (path == kPreInstallPath) {
-        configureChannel(kPreInstallAttribute, permissions);
+    } else if (path == kLockInPriceAttribute) {
+        configureChannel(kLockInPriceAttribute, permissions);
+    } else if (path == kReleaseToProductionAttribute) {
+        configureChannel(kReleaseToProductionAttribute, permissions);
+    } else if (path == kReleaseForShipmentAttribute) {
+        configureChannel(kReleaseForShipmentAttribute, permissions);
     } else if (path == kInstallPath) {
         configureChannel(kInstallAttribute, permissions);
     } else if (path == kLeasingPath) {
@@ -159,6 +177,11 @@ function setChannelStates(permissions) {
     } else if (path == kManagementPath) {
         configureChannel(kManagementAttribute, permissions);
     }
+
+    // Pre-Install permission is deprecated – now Missing Items
+    /*else if (path == kPreInstallPath) {
+        configureChannel(kMissingItemsAttribute, permissions);
+    }*/
 }
 
 function configureChannel(channelAttribute, permissions) {
@@ -206,9 +229,9 @@ function setChannelHidden(channelAttribute, state) {
 }
 
 function permissionsWithChannel(channelAttribute) {
-    if (channelAttribute == kSalesAttribute) {
+    if (channelAttribute == kSalesAttribute ||  channelAttribute == kLockInPriceAttribute) {
         return [kReadSalesPermissions, kWriteSalesPermissions];
-    } else if (channelAttribute == kPreInstallAttribute) {
+    } else if (channelAttribute == kMissingItemsAttribute || channelAttribute == kReleaseToProductionAttribute || channelAttribute == kReleaseForShipmentAttribute) {
         return [kReadPreInstallPermissions, kWritePreInstallPermissions];
     } else if (channelAttribute == kInstallAttribute) {
         return [kReadInstallPermissions, kWriteInstallPermissions];
@@ -261,9 +284,11 @@ const attachListeners = () => {
     }
 }
 
-const logoutButton = document.querySelector("[auth0-logout]");
-if (logoutButton) {
-    logoutButton.addEventListener("click", () => logout());
+const logoutButtons = document.querySelectorAll("[auth0-logout]");
+if (logoutButtons) {
+    logoutButtons.forEach(function (logoutButton) {
+        logoutButton.addEventListener("click", () => logout());
+    });
 }
 
 const login = async () => {
@@ -342,11 +367,15 @@ const handleAuth0 = async () => {
     const isAuthenticated = await auth0Client.isAuthenticated();
 
     // Handling Intro page ad hoc
-    if (logoutButton && isIntroPage) {
+    if (logoutButtons && isIntroPage) {
         if (isAuthenticated) {
-            logoutButton.innerText = "Log out";
+            logoutButtons.forEach(function (logoutButton) {
+                logoutButton.innerText = "Log out";
+            });
         } else {
-            logoutButton.style.display = "none";
+            logoutButtons.forEach(function (logoutButton) {
+                logoutButton.style.display = "none";
+            });
         }
     }
 
@@ -506,21 +535,24 @@ if (pageRequiresAuthentication()) {
 function latestChannelPath(cachedResponse) {
     if (isMobileDevice()) {
         return kInstallPath;
+    } else {
+        return kIntroPath;
     }
 
-    const permissions = cachedResponse.permissions;
-    var latestAttribute = kChannelAttributes[0];
-    for (const attribute of kChannelAttributes) {
-        if (attribute == kIntroAttribute) {
-            continue;
-        }
-        const channelPermissions = permissionsWithChannel(attribute);
-        if (hasChannelPermission(permissions, channelPermissions)) {
-            latestAttribute = attribute;
-        }
-    }
+    // Old code that used to determine latest channel path
+    // const permissions = cachedResponse.permissions;
+    // var latestAttribute = kChannelAttributes[0];
+    // for (const attribute of kChannelAttributes) {
+    //     if (attribute == kIntroAttribute) {
+    //         continue;
+    //     }
+    //     const channelPermissions = permissionsWithChannel(attribute);
+    //     if (hasChannelPermission(permissions, channelPermissions)) {
+    //         latestAttribute = attribute;
+    //     }
+    // }
 
-    return latestAttribute;
+    // return latestAttribute;
 }
 
 function isMobileDevice() {
