@@ -548,6 +548,8 @@ window.onload = async () => {
     //     }
     // }
 
+    var cachedResponse = null;
+    
     await handleAuth0();
     const isAuthenticated = await auth0Client.isAuthenticated();
     if (isAuthenticated) {
