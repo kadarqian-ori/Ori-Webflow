@@ -582,14 +582,13 @@ window.onload = async () => {
         cachedResponse = await getPortalResponse();
         setBuildingName(cachedResponse.buildingName);
         setMissingItemsNotificationState(cachedResponse.outstandingRFIsCount + cachedResponse.missingCOs);
-        if (isMobileDevice()) {
+        if (isMobileDevice() && window.location.pathname != kInstallPath) {
             // redirect to kInstallPath if not in install path
-
-            // if (isStaging) {
-            //     window.location = `https://onboarding-portal-0746fa.webflow.io${kInstallPath}`;
-            // } else {
-            //     window.location = `https://property.oriliving.com${kInstallPath}`;
-            // }
+            if (isStaging) {
+                window.location = `https://onboarding-portal-0746fa.webflow.io${kInstallPath}`;
+            } else {
+                window.location = `https://property.oriliving.com${kInstallPath}`;
+            }
         }
     } else {
         if (isMobileDevice()) {
